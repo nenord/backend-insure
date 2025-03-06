@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, Response # type: ignore
 from pymongo import MongoClient # type: ignore
 from fastapi.security import OAuth2PasswordRequestForm # type: ignore
 
-from routes import router as user_router
+from routers import users
 from models import User_Out
 from helpers import verify_password, create_access_token, find_user_email, get_current_user
 
@@ -21,7 +21,7 @@ def startup_db_client():
 def shutdown_db_client():
     app.mongodb_client.close()
 
-app.include_router(user_router, tags=["users"], prefix="/users")
+app.include_router(users.router)
 
 @app.get("/")
 async def root():
