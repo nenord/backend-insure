@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 from pydantic import BaseModel, Field, EmailStr # type: ignore
 
 class User(BaseModel):
@@ -13,6 +14,16 @@ class User_In(User):
 class User_InDB(User):
     password_hash: str = Field(title="Hashed password")
     role: str = Field(title="User role")
+    # add a field called milage inputs that is a list of dictionary objects
+    # with the following fields: date, milage
+    milage_inputs: list[dict] = Field(title="List of milage inputs")
+
 
 class User_Out(User):
     role: str = Field(title="User role")
+
+# add a class calld Vehicle that inherits from BaseModel with field called make and model 
+# where model is a list of strings
+class Vehicle(BaseModel):
+    make: str = Field(title="Vehicle make", min_length=1, max_length=32)
+    models: list[str] = Field(title="List of vehicle models")

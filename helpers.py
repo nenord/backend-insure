@@ -17,6 +17,9 @@ SECRET_KEY = config["SECRET_KEY"]
 ALGORITHM = "HS256"
 EXPIRE_TOKEN = config["EXPIRE_TOKEN"]
 
+mongo_client = MongoClient(config["ATLAS_URI"])
+mongo_db = mongo_client[config["DB_NAME"]]
+
 def get_password_hash(password):
     return pwd_context.hash(password)
 
@@ -39,8 +42,6 @@ def find_user_email(email: str, app):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User not found")
 
 def find_user_id(id: str):
-    mongo_client = MongoClient(config["ATLAS_URI"])
-    mongo_db = mongo_client[config["DB_NAME"]]
     if (user := mongo_db["users"].find_one({"_id": id})) is not None:
         return user
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User not found")
@@ -62,3 +63,18 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     if user is None:
         raise credentials_exception
     return User_Out(**user)
+
+# define a function that checks if the vehicle make is in the database
+def check_vehicle_make(make: str):
+    vehicle_to_check = mongo_db["vehicles"].find_one({"make": make})
+    if vehicle_to_check is not None:
+        return vehicle_to_check
+    return None
+
+# define a function that checks if the vehicle model is in the database
+def check_vehicle_model(make: str, model: str):
+    vehicle_to_check = mongo_db["vehicles"].find_one({"make": make})
+    if vehicle_to_check is not None:
+        if model in vehicle_to_check["models"]:
+            return vehicle_to_check
+    return None
