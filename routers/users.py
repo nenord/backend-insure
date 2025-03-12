@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Body, Depends, Request, Response, HTTPException, status # type: ignore
 from fastapi.encoders import jsonable_encoder # type: ignore
 from typing import List
+from bson.objectid import ObjectId
 
 import sys
 sys.path.append("..")
@@ -14,7 +15,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}
 )
 
-@router.post("/", response_description="Create a new user", status_code=status.HTTP_201_CREATED, response_model=User)
+@router.post("/", response_description="Create a new user", status_code=status.HTTP_201_CREATED, response_model=User_Out)
 def create_user(request: Request, user: User_In = Body(...)):
     user = jsonable_encoder(user)
     hash_password = get_password_hash(user['password'])
@@ -38,7 +39,7 @@ def list_users(request: Request, current_user: User_Out = Depends(get_current_us
 
 @router.get("/{id}", response_description="Get a user by id", response_model=User_Out)
 def find_user(id: str, request: Request, current_user: User_Out = Depends(get_current_user)):
-    if (user := request.app.database["users"].find_one({"_id": id})) is not None:
+    if (user := request.app.database["users"].find_one({"_id": ObjectId(id)})) is not None:
         if current_user.role == 'admin' or str(current_user.id) == id:
             return user
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")

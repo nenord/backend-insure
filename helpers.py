@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from dotenv import dotenv_values
 from typing import Optional
 import jwt
+from bson.objectid import ObjectId
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -54,7 +55,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        token_id: str = payload.get("sub")
+        token_id: str = ObjectId(payload.get("sub"))
         if token_id is None:
             raise credentials_exception
     except jwt.InvalidTokenError:
@@ -71,10 +72,8 @@ def check_vehicle_make(make: str):
         return vehicle_to_check
     return None
 
-# define a function that checks if the vehicle model is in the database
-def check_vehicle_model(make: str, model: str):
-    vehicle_to_check = mongo_db["vehicles"].find_one({"make": make})
-    if vehicle_to_check is not None:
-        if model in vehicle_to_check["models"]:
-            return vehicle_to_check
-    return None
+def combine_lists(list1, list2):
+    for item in list2:
+        if item not in list1:
+            list1.append(item)
+    return list1

@@ -34,7 +34,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = find_user_email(form_data.username, app = app.database)
     if not verify_password(form_data.password, user['password_hash']):
        raise login_exception
-    access_token = create_access_token( data={"sub": user['_id']} )
+    access_token = create_access_token( data={"sub": str(user['_id'])} )
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get("/whoami")
