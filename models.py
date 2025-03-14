@@ -26,3 +26,16 @@ class Vehicle(BaseModel):
 
 class Vehicle_Out(Vehicle):
     id: PyObjectId = Field(alias="_id", default=None)
+
+# crete a class called Policy_In that inherits from BaseModel with fields called user_id, 
+# vehicle (which is a dictionary), year, agreed_milage, and milage_used that will be a list of dictionaries
+class Policy(BaseModel):
+    user_id: PyObjectId = Field(title="User ID")
+    make: str = Field(title="Vehicle make", min_length=1, max_length=32)
+    model: str = Field(title="Vehicle model", min_length=1, max_length=32)
+    year: int = Field(title="Year of policy", min=2000, max=2025)
+    agreed_milage: int = Field(title="Agreed milage", min=2000, max=8000)
+    mileage_used: dict = Field(title="Mileage updates", default={})
+
+class Add_Milage(BaseModel):
+    mileage: int = Field(title="Milage to be added", min=0)

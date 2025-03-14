@@ -7,7 +7,7 @@ import sys
 sys.path.append("..")
 
 from helpers import get_password_hash, get_current_user
-from models import User, User_In, User_Out
+from models import User_In, User_Out
 
 router = APIRouter(
     prefix="/users",
