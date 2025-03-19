@@ -48,7 +48,7 @@ def find_user(id: str, request: Request, current_user: User_Out = Depends(get_cu
 @router.delete("/{id}", response_description="Delete a user")
 def delete_user(id: str, request: Request, response: Response, current_user: User_Out = Depends(get_current_user)):
     if current_user.role == 'admin' or str(current_user.id) == id:
-        delete_result = request.app.database["users"].delete_one({"_id": id})
+        delete_result = request.app.database["users"].delete_one({"_id": ObjectId(id)})
         if delete_result.deleted_count == 1:
             response.status_code = status.HTTP_204_NO_CONTENT
             return response

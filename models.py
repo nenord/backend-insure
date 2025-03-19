@@ -33,9 +33,12 @@ class Policy(BaseModel):
     user_id: PyObjectId = Field(title="User ID")
     make: str = Field(title="Vehicle make", min_length=1, max_length=32)
     model: str = Field(title="Vehicle model", min_length=1, max_length=32)
-    year: int = Field(title="Year of policy", min=2000, max=2025)
-    agreed_milage: int = Field(title="Agreed milage", min=2000, max=8000)
-    mileage_used: dict = Field(title="Mileage updates", default={})
+    year: int = Field(title="Year of policy", ge=2000, le=2025)
+    agreed_milage: int = Field(title="Agreed milage", ge=1000, le=8000)
+
+class Policy_Out(Policy):
+    id: PyObjectId = Field(alias="_id", default=None)
+    mileage_used: dict = Field(title="Mileage updates")
 
 class Add_Milage(BaseModel):
-    mileage: int = Field(title="Milage to be added", min=0)
+    mileage: int = Field(title="Milage to be added", gt=0)
