@@ -4,7 +4,7 @@ from bson.objectid import ObjectId
 from datetime import datetime
 
 from models import Policy, Policy_Out, User_Out, Add_Milage
-from helpers import get_current_user
+from helpers import get_current_user, check_vehicle_make
 
 import sys
 sys.path.append("..")
@@ -22,7 +22,14 @@ def create_policy(request: Request, policy: Policy = Body(...), current_user: Us
     #check if policy id is the same as current user id
     if policy["user_id"] != str(current_user.id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
-    policy["mileage_used"] = {}
+    #check if vehicle make is in the database
+    vehicle_to_check = check_vehicle_make(policy["make"])
+    if vehicle_to_check is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Vehicle make not found")
+    #check if vehicle model is in the database
+    if policy["model"] not in vehicle_to_check["models"]:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Vehicle model not found")
+    policy["mileage_used"] = { datetime.now().isoformat(): 0 }
     new_policy = request.app.database["policies"].insert_one(policy)
     created_user = request.app.database["policies"].find_one(
         {"_id": new_policy.inserted_id}
@@ -37,6 +44,12 @@ def update_policy_mileage(id: str, request: Request, mileage: Add_Milage = Body(
     if policy is not None:
         if policy["user_id"] != str(current_user.id):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+        
+        # find the highest value in policy dictionary
+        highest_mileage = max(policy["mileage_used"].values())
+        # check if the mileage to be added is greater than the previous highest mileage
+        if mileage["mileage"] <= highest_mileage:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Mileage must be greater than previous mileage")
         
         policy_milage_to_update = policy["mileage_used"]
         policy_milage_to_update[datetime.now().isoformat()] = mileage["mileage"]
