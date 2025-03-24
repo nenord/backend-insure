@@ -7,7 +7,7 @@ import sys
 sys.path.append("..")
 
 from helpers import get_password_hash, get_current_user
-from models import User_In, User_Out
+from models import User, User_In, User_Out
 
 router = APIRouter(
     prefix="/users",
@@ -54,3 +54,22 @@ def delete_user(id: str, request: Request, response: Response, current_user: Use
             return response
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with ID {id} not found")
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+
+# add a patch route for updating user profile (name and email only)
+@router.patch("/{id}", response_description="Update user role", response_model=User_Out)
+def update_user(id: str, request: Request, user: User = Body(...), current_user: User_Out = Depends(get_current_user)):
+    user = jsonable_encoder(user)
+    if request.app.database["users"].find_one({"_id": ObjectId(id)}) is not None:
+        if current_user.role == 'admin' or str(current_user.id) == id:
+            request.app.database["users"].update_one(
+                {"_id": ObjectId(id)},
+                {"$set": {"first_name": user["first_name"],
+                        "last_name": user["last_name"],
+                        "email": user["email"]
+                        }
+                }      
+            )
+            user_to_return = request.app.database["users"].find_one({"_id": ObjectId(id)})
+            return user_to_return
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with ID {id} not found")

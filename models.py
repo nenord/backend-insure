@@ -27,6 +27,7 @@ class Vehicle(BaseModel):
 class Vehicle_Out(Vehicle):
     id: PyObjectId = Field(alias="_id", default=None)
 
+
 # crete a class called Policy_In that inherits from BaseModel with fields called user_id, 
 # vehicle (which is a dictionary), year, agreed_milage, and milage_used that will be a list of dictionaries
 class Policy(BaseModel):
