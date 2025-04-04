@@ -7,9 +7,21 @@ from models import User_Out
 from helpers import verify_password, create_access_token, find_user_email, get_current_user
 
 from dotenv import dotenv_values
+from fastapi.middleware.cors import CORSMiddleware
 config = dotenv_values(".env")
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 def startup_db_client():
