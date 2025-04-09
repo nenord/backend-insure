@@ -4,7 +4,7 @@ from bson.objectid import ObjectId
 from datetime import datetime
 
 from models import Policy, Policy_Out, User_Out, Add_Milage
-from helpers import get_current_user, check_vehicle_make
+from helpers import get_current_user, check_vehicle_make, get_policies_by_user_id
 
 import sys
 sys.path.append("..")
@@ -65,7 +65,11 @@ def update_policy_mileage(id: str, request: Request, mileage: Add_Milage = Body(
 @router.get("/", response_description="List all policies", response_model=list[Policy_Out])
 def list_policies(request: Request, current_user: User_Out = Depends(get_current_user)):
     if current_user.role != 'admin':
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+        policies = get_policies_by_user_id(str(current_user.id))
+        if not policies:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No policies found")
+        return policies
+    # if user is admin, return all policies
     policies = list(request.app.database["policies"].find(limit=100))
     return policies
 

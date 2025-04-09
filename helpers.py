@@ -77,3 +77,7 @@ def combine_lists(list1, list2):
         if item not in list1:
             list1.append(item)
     return list1
+
+def get_policies_by_user_id(user_id: str):
+    policies = mongo_db["policies"].find({"user_id": user_id})
+    return list(policies)
