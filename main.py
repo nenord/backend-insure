@@ -6,14 +6,16 @@ from routers import users, vehicles, policies
 from models import User_Out
 from helpers import verify_password, create_access_token, find_user_email, get_current_user
 
-from dotenv import dotenv_values
+#from dotenv import dotenv_values
+import os
 from fastapi.middleware.cors import CORSMiddleware
-config = dotenv_values(".env")
+#config = dotenv_values(".env")
 
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173"
+    #"http://localhost:5173"
+    "*"
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -25,8 +27,10 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup_db_client():
-    app.mongodb_client = MongoClient(config["ATLAS_URI"])
-    app.database = app.mongodb_client[config["DB_NAME"]]
+    #app.mongodb_client = MongoClient(config["ATLAS_URI"])
+    #app.database = app.mongodb_client[config["DB_NAME"]]
+    app.mongodb_client = MongoClient(os.environ["ATLAS_URI"])
+    app.database = app.mongodb_client[os.environ["DB_NAME"]]
     print("Connected to the MongoDB database!")
 
 @app.on_event("shutdown")

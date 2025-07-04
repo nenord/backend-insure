@@ -7,19 +7,22 @@ from dotenv import dotenv_values
 from typing import Optional
 import jwt
 from bson.objectid import ObjectId
+import os
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 from models import User_Out
 
-config = dotenv_values(".env")
-SECRET_KEY = config["SECRET_KEY"]
+#config = dotenv_values(".env")
+#SECRET_KEY = config["SECRET_KEY"]
+SECRET_KEY = os.environ['SECRET_KEY']
 ALGORITHM = "HS256"
-EXPIRE_TOKEN = config["EXPIRE_TOKEN"]
+#EXPIRE_TOKEN = config["EXPIRE_TOKEN"]
+EXPIRE_TOKEN = os.environ['EXPIRE_TOKEN']
 
-mongo_client = MongoClient(config["ATLAS_URI"])
-mongo_db = mongo_client[config["DB_NAME"]]
+mongo_client = MongoClient(os.environ["ATLAS_URI"])
+mongo_db = mongo_client[os.environ["DB_NAME"]]
 
 def get_password_hash(password):
     return pwd_context.hash(password)
