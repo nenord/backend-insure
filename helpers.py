@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer # type: ignore
 from passlib.context import CryptContext # type: ignore
 from pymongo import MongoClient # type: ignore
 from datetime import datetime, timedelta, timezone
-from dotenv import dotenv_values
+#from dotenv import dotenv_values
 from typing import Optional
 import jwt
 from bson.objectid import ObjectId
