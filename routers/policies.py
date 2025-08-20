@@ -62,7 +62,7 @@ def update_policy_mileage(id: str, request: Request, mileage: Add_Milage = Body(
     
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Policy with ID {id} not found")
 
-@router.get("/", response_description="List all policies", response_model=list[Policy_Out])
+@router.get("", response_description="List all policies", response_model=list[Policy_Out])
 def list_policies(request: Request, current_user: User_Out = Depends(get_current_user)):
     if current_user.role != 'admin':
         policies = get_policies_by_user_id(str(current_user.id))
