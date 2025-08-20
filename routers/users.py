@@ -30,7 +30,7 @@ def create_user(request: Request, user: User_In = Body(...)):
     )
     return created_user
 
-@router.get("/", response_description="List all users", response_model=List[User_Out])
+@router.get("", response_description="List all users", response_model=List[User_Out])
 def list_users(request: Request, current_user: User_Out = Depends(get_current_user)):
     if current_user.role == 'admin':
         users = list(request.app.database["users"].find(limit=100))
